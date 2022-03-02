@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.0 <0.9.0;
 
+// Fixing this later, i kept the correct code somewhere i can't remember, lol
+
 /// @title Piggybank smart contract
 /// @author Perelyn-Sama
 /// @notice A Piggy bank smart contract that allows the owner to save money for a particular period and after this period is completed the owner can withdraw from this contract and that would destroy the contract
@@ -12,12 +14,8 @@ contract PiggyBank {
     uint256 public deployedAt;
     uint256 public end; 
 
-    uint public second = 1 seconds;
-    uint public minute = 1 minutes;
-    uint public hour = 1 hours;
-    uint public day = 1 days;
-
-    constructor()  public {  
+    constructor(string memory _str, uint _num)  public {  
+        uint timeNum = getTime(_str, _num);
         owner = msg.sender;
         hasBeenDeployed = true;
         deployedAt = block.timestamp;
@@ -50,7 +48,7 @@ contract PiggyBank {
         }
     }
 
-     function getTime(string memory str, uint num) external returns(uint res) {
+    function getTime(string memory str, uint num) external returns(uint res) {
         if(check(str, 'days')){
             res = num * 86400;   
         }else if(check(str, 'hours')) {
@@ -63,3 +61,4 @@ contract PiggyBank {
             res = 0;
         }
     }
+}

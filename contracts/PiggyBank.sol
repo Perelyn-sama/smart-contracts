@@ -12,7 +12,8 @@ contract PiggyBank {
     address public owner;
     bool public hasBeenDeployed = false;
     uint256 public deployedAt;
-    uint256 public end; 
+    uint256 public end;
+    bool private locked;
 
     constructor(string memory _str, uint _num)  public {  
         uint timeNum = getTime(_str, _num);
@@ -25,6 +26,17 @@ contract PiggyBank {
     event Deposit(uint amount);
     event Withdraw(uint amount);
 
+
+
+
+    modifier noReentrance
+    {
+        require(!locked, "No Reentrance");
+        locked = true;
+        _;
+        locked = false;
+    }
+
     receive() external payable {
         emit Deposit(msg.value);
     }
@@ -33,7 +45,7 @@ contract PiggyBank {
         piggyBal = address(this).balance;
     }
 
-    function withdraw() external {
+    function withdraw() external noReentrance {
         require(msg.sender == owner );
         require(block.timestamp >= end, "It's not time yet");
         emit Withdraw(address(this).balance);
@@ -60,5 +72,17 @@ contract PiggyBank {
         }else {
             res = 0;
         }
+    }
+
+    
+    
+    
+    function deposit() public payable noReentrance
+    {
+        require(msg.sender == owner, "!Owner");
+        require(hasBeenDeployed == true, "This piggy bank has not been deployed.");
+        require(block.timestamp < end, "This piggy bank has ended.");
+
+        emit Deposit(msg.value);
     }
 }
